@@ -82,6 +82,96 @@ LANGUAGE_COLORS = {
 }
 
 
+def get_profile_content_definition(user_data, top_languages):
+    """
+    Define the content structure for the profile.
+
+    This function returns a list of tuples defining the content lines to display.
+    Each tuple contains (key, value) where:
+    - key: The field name or special marker
+    - value: The field value or empty string for special cases
+
+    Special markers:
+    - "GAP": Adds vertical spacing
+    - Keys starting with "—": Section headers
+    - "PLACEHOLDER": Will be replaced with actual data during rendering
+
+    Args:
+        user_data: GitHub user data from API
+        top_languages: List of top programming languages
+
+    Returns:
+        List of (key, value) tuples defining the profile content
+    """
+    # Calculate age for uptime
+    created_date = datetime.fromisoformat(user_data['createdAt'].replace('Z', '+00:00'))
+    age = datetime.now(created_date.tzinfo) - created_date
+    years = age.days // 365
+    months = (age.days % 365) // 30
+    days = (age.days % 365) % 30
+
+    # Build the content structure
+    content_lines = []
+
+    # System info section
+    content_lines.extend([
+        ("OS", "Windows 10, Android 14, Linux"),
+        ("Uptime", f"{years} years, {months} months, {days} days"),
+        ("Host", user_data.get("company", "TTM Technologies, Inc.") or "TTM Technologies, Inc."),
+        ("Kernel", "CAM (Computer Aided Manufacturing) Operator"),
+        ("IDE", "IDEA 2023.3.2, VSCode 1.96.0"),
+    ])
+
+    # Add gap before languages section
+    content_lines.append(("GAP", ""))
+
+    # Languages section
+    content_lines.extend([
+        ("Languages.Programming", ", ".join(top_languages) if top_languages else "Java, Python, JavaScript, C++"),
+        ("Languages.Computer", "HTML, CSS, JSON, LaTeX, YAML"),
+        ("Languages.Real", "English, Spanish"),
+    ])
+
+    # Add gap before hobbies section
+    content_lines.append(("GAP", ""))
+
+    # Hobbies section
+    content_lines.extend([
+        ("Hobbies.Software", "Minecraft Modding, iOS Jailbreaking"),
+        ("Hobbies.Hardware", "Overclocking, Undervolting"),
+    ])
+
+    # Add gap and Contact section header
+    content_lines.extend([
+        ("GAP", ""),
+        ("— Contact ", ""),
+    ])
+
+    # Contact info
+    content_lines.extend([
+        ("Email.Personal", "agrantnmac@gmail.com"),
+        ("Email.Personal", "andrew@grant.software"),
+        ("Email.Work", "Andrew.Grant@ttmtech.com"),
+        ("LinkedIn", "Andrew6rant"),
+        ("Discord", "andrew6rant"),
+    ])
+
+    # Add gap and GitHub Stats section header
+    content_lines.extend([
+        ("GAP", ""),
+        ("— GitHub Stats ", ""),
+    ])
+
+    # GitHub Stats (values will be replaced during rendering)
+    content_lines.extend([
+        ("Repos", "PLACEHOLDER"),
+        ("Commits", "PLACEHOLDER"),
+        ("Lines of Code on GitHub", "PLACEHOLDER")
+    ])
+
+    return content_lines
+
+
 class GitHubProfileGenerator:
     def __init__(self, token, username):
         self.token = token
@@ -212,6 +302,16 @@ class GitHubProfileGenerator:
             styled_value = f'<tspan class="value">{value}</tspan>'
 
         return f'. <tspan class="key">{key}</tspan>: {dots}{styled_value}'
+
+    def get_content_lines(self, user, language_percentages):
+        """Get content lines using the profile content definition function"""
+        # Top languages for display (up to 4)
+        top_languages = []
+        if language_percentages:
+            top_languages = list(language_percentages.keys())[:4]
+
+        # Use the external content definition function
+        return get_profile_content_definition(user, top_languages)
 
     def get_user_data_multi_year(self, years_back=5):
         """Fetch user data across multiple years"""
@@ -498,31 +598,18 @@ class GitHubProfileGenerator:
             green_color = '#1a7f37'
             red_color = '#cf222e'
 
-        # Calculate age
-        created_date = datetime.fromisoformat(user['createdAt'].replace('Z', '+00:00'))
-        age = datetime.now(created_date.tzinfo) - created_date
-        years = age.days // 365
-        months = (age.days % 365) // 30
-        days = (age.days % 365) % 30
-
         # Constants for layout calculation
         svg_width = 1000
         line_height = 22
         ascii_height = 460  # Height of ASCII art section
         top_margin = 35
 
-        # Calculate the number of content lines we'll have
-        system_lines_count = 5  # OS, Uptime, Host, Kernel, IDE
-        languages_lines_count = 3  # Programming, Computer, Real
-        hobbies_lines_count = 2  # Software, Hardware
-        contact_lines_count = 5  # Email.Personal (2), Email.Work, LinkedIn, Discord
-        stats_lines_count = 3  # Repos, Commits, Lines of Code
+        # Dynamically calculate content lines
+        content_lines = self.get_content_lines(user, language_percentages)
 
-        # Count section headers (Contact, GitHub Stats)
-        section_headers_count = 2
-
-        # Count gaps before sections (Languages, Hobbies, Contact, GitHub Stats)
-        section_gaps_count = 4
+        # Count different types of lines
+        text_lines_count = len([line for line in content_lines if line[0] != "GAP"])
+        gap_lines_count = len([line for line in content_lines if line[0] == "GAP"])
 
         # Count language details (top 6 languages shown)
         language_details_count = min(6, len(language_percentages)) if language_percentages else 0
@@ -530,28 +617,26 @@ class GitHubProfileGenerator:
         # Calculate total content lines
         total_content_lines = (
                 1 +  # User header
-                system_lines_count +
-                languages_lines_count +
-                hobbies_lines_count +
-                section_headers_count +
-                contact_lines_count +
-                stats_lines_count +
-                section_gaps_count +
+                text_lines_count +
+                gap_lines_count +
                 language_details_count
         )
 
-        # Calculate content height (removed bottom_margin)
+        # Calculate content height (no spacing before language bar, increased spacing after)
         content_height = (
                 top_margin +  # Initial margin
                 25 +  # Space after user header
                 (total_content_lines * line_height) +  # All text lines
-                15 +  # Space before language bar
                 10 +  # Language bar height
-                15  # Space after language bar
+                35 +  # Space between language bar and language details (increased from 25)
+                15  # Space after language details
         )
 
         # Take the maximum of ASCII art height and content height, add some padding
         svg_height = max(ascii_height + top_margin, content_height) + 20
+
+        print(f"Debug: Content lines: {len(content_lines)}, Language details: {language_details_count}")
+        print(f"Debug: Total lines: {total_content_lines}, SVG height: {svg_height}")
 
         # Start building SVG with updated font and styling
         svg_content = f'''<?xml version='1.0' encoding='UTF-8'?>
@@ -623,113 +708,27 @@ text, tspan {{white-space: pre;}}
         stars = user.get('starredRepositories', {}).get('totalCount', 0) if user.get('starredRepositories') else 0
         followers = user.get('followers', {}).get('totalCount', 0) if user.get('followers') else 0
 
-        # Top languages for display (up to 4)
-        top_languages = []
-        if language_percentages:
-            top_languages = list(language_percentages.keys())[:4]
-
         # Define special styling for lines with colored content
         special_styling = {
             "Lines of Code on GitHub": lambda
                 value: f'<tspan class="value">{net_lines:,} ( <tspan class="addColor">{total_additions:,}++</tspan>,  <tspan class="delColor">{total_deletions:,}--</tspan> )</tspan>'
         }
 
-        # System info section
-        system_lines = [
-            ("OS", "Windows 10, Android 14, Linux"),
-            ("Uptime", f"{years} years, {months} months, {days} days"),
-            ("Host", user.get("company", "TTM Technologies, Inc.") or "TTM Technologies, Inc."),
-            ("Kernel", "CAM (Computer Aided Manufacturing) Operator"),
-            ("IDE", "IDEA 2023.3.2, VSCode 1.96.0"),
-        ]
+        # Render all content lines dynamically
+        for key, value in content_lines:
+            if key == "GAP":
+                # Add gap (just increase y_current)
+                y_current += line_height
+                continue
 
-        # Add system info with proper styling
-        for key, value in system_lines:
-            styled_line = self.format_styled_line(key, value)
-            svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{styled_line}</tspan>
-</text>'''
-            y_current += line_height
+            # Replace placeholder values for stats
+            if key == "Repos":
+                value = f"{repos_owned} {{Contributed: {repos_contributed}}} | Stars: {stars}"
+            elif key == "Commits":
+                value = f"{data['total_commits']:,} | Followers: {followers}"
+            elif key == "Lines of Code on GitHub":
+                value = f"{net_lines:,} ( {total_additions:,}++,  {total_deletions:,}-- )"
 
-        # Add gap and Languages section
-        y_current += line_height  # Gap before languages section
-
-        languages_lines = [
-            ("Languages.Programming", ", ".join(top_languages) if top_languages else "Java, Python, JavaScript, C++"),
-            ("Languages.Computer", "HTML, CSS, JSON, LaTeX, YAML"),
-            ("Languages.Real", "English, Spanish"),
-        ]
-
-        for key, value in languages_lines:
-            styled_line = self.format_styled_line(key, value)
-            svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{styled_line}</tspan>
-</text>'''
-            y_current += line_height
-
-        # Add gap and Hobbies section
-        y_current += line_height  # Gap before hobbies section
-
-        hobbies_lines = [
-            ("Hobbies.Software", "Minecraft Modding, iOS Jailbreaking"),
-            ("Hobbies.Hardware", "Overclocking, Undervolting"),
-        ]
-
-        for key, value in hobbies_lines:
-            styled_line = self.format_styled_line(key, value)
-            svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{styled_line}</tspan>
-</text>'''
-            y_current += line_height
-
-        # Add gap and Contact section header
-        y_current += line_height  # Gap before Contact header
-
-        contact_header = self.format_styled_line("— Contact ", "")
-        svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{contact_header}</tspan>
-</text>'''
-        y_current += line_height
-
-        # Contact info
-        contact_lines = [
-            ("Email.Personal", "agrantnmac@gmail.com"),
-            ("Email.Personal", "andrew@grant.software"),
-            ("Email.Work", "Andrew.Grant@ttmtech.com"),
-            ("LinkedIn", "Andrew6rant"),
-            ("Discord", "andrew6rant"),
-        ]
-
-        for key, value in contact_lines:
-            styled_line = self.format_styled_line(key, value)
-            svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{styled_line}</tspan>
-</text>'''
-            y_current += line_height
-
-        # Add gap and GitHub Stats section header
-        y_current += line_height  # Gap before GitHub Stats header
-
-        github_header = self.format_styled_line("— GitHub Stats ", "")
-        svg_content += f'''
-<text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
-<tspan x="{x_main}" y="{y_current}">{github_header}</tspan>
-</text>'''
-        y_current += line_height
-
-        # GitHub Stats
-        stats_lines = [
-            ("Repos", f"{repos_owned} {{Contributed: {repos_contributed}}} | Stars: {stars}"),
-            ("Commits", f"{data['total_commits']:,} | Followers: {followers}"),
-            ("Lines of Code on GitHub", f"{net_lines:,} ( {total_additions:,}++,  {total_deletions:,}-- )")
-        ]
-
-        for key, value in stats_lines:
             styled_line = self.format_styled_line(key, value, special_styling)
             svg_content += f'''
 <text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
@@ -737,9 +736,7 @@ text, tspan {{white-space: pre;}}
 </text>'''
             y_current += line_height
 
-        y_current += 15
-
-        # Language progress bar and stats
+        # Language progress bar and stats (no spacing before bar)
         if language_percentages:
             # Add progress bar - wider for 1000px SVG
             svg_content += f'<g transform="translate({x_main}, {y_current})">'
@@ -748,7 +745,7 @@ text, tspan {{white-space: pre;}}
                 svg_content += f'  {element}'
             svg_content += '</g>'
 
-            y_current += 25
+            y_current += 35  # Spacing after language bar before language details
 
             # Language details
             for i, (lang, stats) in enumerate(list(language_percentages.items())[:6]):  # Show top 6 languages
