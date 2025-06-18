@@ -1,30 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" font-family="MonaspaceKryptonFallback,'Monaspace Krypton',monospace" width="1000px" height="802px" font-size="14px">
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Monaspace Krypton',monospace" width="1000px" height="802px" font-size="14px">
 <style>
-@font-face {
-font-family: 'MonaspaceKryptonFallback';
-src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Regular.woff2') format('woff2'),
-     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Regular.otf') format('opentype'),
-     local('Monaspace Krypton'),
-     local('Consolas'),
-     local('Monaco'),
-     monospace;
-font-display: swap;
-font-weight: normal;
-font-style: normal;
-}
-@font-face {
-font-family: 'MonaspaceKryptonFallback';
-src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Bold.woff2') format('woff2'),
-     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Bold.otf') format('opentype'),
-     local('Monaspace Krypton Bold'),
-     local('Consolas Bold'),
-     local('Monaco Bold'),
-     monospace;
-font-display: swap;
-font-weight: bold;
-font-style: normal;
-}
+@import url("https://cdn.jsdelivr.net/gh/iXORTech/webfonts@main/monaspace/krypton/krypton.css");
 .key {fill: #ffa657; font-weight: bold;}
 .value {fill: #a5d6ff;}
 .addColor {fill: #3fb950;}

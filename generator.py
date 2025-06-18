@@ -553,34 +553,11 @@ class GitHubProfileGenerator:
         # Take the maximum of ASCII art height and content height, add some padding
         svg_height = max(ascii_height + top_margin, content_height) + 20
 
-        # Start building SVG with calculated height
+        # Start building SVG with updated font and styling
         svg_content = f'''<?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" font-family="MonaspaceKryptonFallback,'Monaspace Krypton',monospace" width="{svg_width}px" height="{svg_height}px" font-size="14px">
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Monaspace Krypton',monospace" width="{svg_width}px" height="{svg_height}px" font-size="14px">
 <style>
-@font-face {{
-font-family: 'MonaspaceKryptonFallback';
-src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Regular.woff2') format('woff2'),
-     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Regular.otf') format('opentype'),
-     local('Monaspace Krypton'),
-     local('Consolas'),
-     local('Monaco'),
-     monospace;
-font-display: swap;
-font-weight: normal;
-font-style: normal;
-}}
-@font-face {{
-font-family: 'MonaspaceKryptonFallback';
-src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Bold.woff2') format('woff2'),
-     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Bold.otf') format('opentype'),
-     local('Monaspace Krypton Bold'),
-     local('Consolas Bold'),
-     local('Monaco Bold'),
-     monospace;
-font-display: swap;
-font-weight: bold;
-font-style: normal;
-}}
+@import url("https://cdn.jsdelivr.net/gh/iXORTech/webfonts@main/monaspace/krypton/krypton.css");
 .key {{fill: {key_color}; font-weight: bold;}}
 .value {{fill: {value_color};}}
 .addColor {{fill: {add_color};}}
