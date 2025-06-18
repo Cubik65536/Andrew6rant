@@ -484,7 +484,7 @@ class GitHubProfileGenerator:
             value_color = '#a5d6ff'
             add_color = '#3fb950'
             del_color = '#f85149'
-            separator_color = '#21262d'
+            separator_color = text_color  # Set separator to same as text color
             green_color = '#238636'
             red_color = '#da3633'
         else:
@@ -494,7 +494,7 @@ class GitHubProfileGenerator:
             value_color = '#0a3069'
             add_color = '#1a7f37'
             del_color = '#cf222e'
-            separator_color = '#d0d7de'
+            separator_color = text_color  # Set separator to same as text color
             green_color = '#1a7f37'
             red_color = '#cf222e'
 

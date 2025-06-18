@@ -6,7 +6,7 @@
 .value {fill: #0a3069;}
 .addColor {fill: #1a7f37;}
 .delColor {fill: #cf222e;}
-.separator {fill: #d0d7de;}
+.separator {fill: #24292f;}
 .green {fill: #1a7f37;}
 .red {fill: #cf222e;}
 text, tspan {white-space: pre;}
