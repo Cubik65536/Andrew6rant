@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" font-family="MonaspaceKryptonFallback,'Monaspace Krypton',monospace" width="1000px" height="802px" font-size="14px">
+<style>
+@font-face {
+font-family: 'MonaspaceKryptonFallback';
+src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Regular.woff2') format('woff2'),
+     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Regular.otf') format('opentype'),
+     local('Monaspace Krypton'),
+     local('Consolas'),
+     local('Monaco'),
+     monospace;
+font-display: swap;
+font-weight: normal;
+font-style: normal;
+}
+@font-face {
+font-family: 'MonaspaceKryptonFallback';
+src: url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/variable/MonaspaceKrypton-Bold.woff2') format('woff2'),
+     url('https://cdn.jsdelivr.net/npm/@monaspace/krypton@1.101.0/fonts/otf/MonaspaceKrypton-Bold.otf') format('opentype'),
+     local('Monaspace Krypton Bold'),
+     local('Consolas Bold'),
+     local('Monaco Bold'),
+     monospace;
+font-display: swap;
+font-weight: bold;
+font-style: normal;
+}
+.key {fill: #ffa657; font-weight: bold;}
+.value {fill: #a5d6ff;}
+.addColor {fill: #3fb950;}
+.delColor {fill: #f85149;}
+.separator {fill: #21262d;}
+.green {fill: #238636;}
+.red {fill: #da3633;}
+text, tspan {white-space: pre;}
+</style>
+<rect width="1000px" height="802px" fill="#0d1117" rx="15"/>
+<text x="50" y="30" fill="#c9d1d9" class="ascii">
+    <tspan x="50" y="50">                  @</tspan>
+    <tspan x="50" y="70">              @@    @@</tspan>
+    <tspan x="50" y="90">           @@@        @@@</tspan>
+    <tspan x="50" y="110">        @-     @@  @@      @</tspan>
+    <tspan x="50" y="130">     @ @#       @@@@       @@ @</tspan>
+    <tspan x="50" y="150">  %      +@@ @@      @@ @@+      @</tspan>
+    <tspan x="50" y="170">*@@      :@@ @@      @@ @@+      @@*</tspan>
+    <tspan x="50" y="190">%<tspan class="green">-</tspan>#@@@%@-       @@@@       .@#@@##<tspan class="red">=</tspan>%</tspan>
+    <tspan x="50" y="210">@<tspan class="green">=**+-</tspan>@@@:    #@@  @@.    -@%@<tspan class="red">*+++=</tspan>%</tspan>
+    <tspan x="50" y="230">@<tspan class="green">*-=+-</tspan>@<tspan class="green">:*</tspan>@@@@@        @@@@##<tspan class="red">-</tspan>@<tspan class="red">=+==+</tspan>@</tspan>
+    <tspan x="50" y="250">@<tspan class="green">-</tspan>@@@<tspan class="green">:</tspan>@<tspan class="green">:**=-</tspan>@<tspan class="green">*</tspan>@@    @@#@<tspan class="red">+=++-</tspan>@<tspan class="red">=</tspan>#@@<tspan class="red">=</tspan>%</tspan>
+    <tspan x="50" y="270">@<tspan class="green">--==</tspan>@@@<tspan class="green">=---</tspan>@<tspan class="green">:+%</tspan>@@@%#<tspan class="red">+-</tspan>@<tspan class="red">+===</tspan>#@@<tspan class="red">+===</tspan>@</tspan>
+    <tspan x="50" y="290">@<tspan class="green">-=**:</tspan>@<tspan class="green">:</tspan>@@@<tspan class="green">-</tspan>@<tspan class="green">:**=</tspan>%%<tspan class="red">=*+=</tspan>@<tspan class="red">+</tspan>@@@<tspan class="red">-</tspan>@<tspan class="red">=+++=</tspan>%</tspan>
+    <tspan x="50" y="310">@@<tspan class="green">%=-:</tspan>@<tspan class="green">:=--*</tspan>@@<tspan class="green">*-:</tspan>##<tspan class="red">-=+</tspan>@@#<tspan class="red">==+-</tspan>@<tspan class="red">-=+#</tspan>@%</tspan>
+    <tspan x="50" y="330">@<tspan class="green">-=</tspan>@@#@<tspan class="green">:=*+=</tspan>@<tspan class="green">:</tspan>#@@@@@@#<tspan class="red">=</tspan>@<tspan class="red">++++-</tspan>@<tspan class="red">*</tspan>@@<tspan class="red">+=</tspan>%</tspan>
+    <tspan x="50" y="350">@<tspan class="green">=+=-:</tspan>@@@<tspan class="green">=-:</tspan>@<tspan class="green">:+-:%</tspan>#<tspan class="red">-=+=</tspan>@<tspan class="red">==+</tspan>@@@<tspan class="red">-==+=</tspan>@</tspan>
+    <tspan x="50" y="370">@<tspan class="green">++**:</tspan>@<tspan class="green">:-</tspan>@@@@<tspan class="green">:-+=</tspan>@@<tspan class="red">=+=-</tspan>@@@@<tspan class="red">=-</tspan>@<tspan class="red">=++-:</tspan>#</tspan>
+    <tspan x="50" y="390"> @@@<tspan class="green">*:</tspan>@<tspan class="green">:+=::</tspan>@@@<tspan class="green">+:</tspan>##<tspan class="red">=+</tspan>@@@<tspan class="red">==++=</tspan>@<tspan class="red">---</tspan>%</tspan>
+    <tspan x="50" y="410">    @@@<tspan class="green">=+==-</tspan>@<tspan class="green">.-</tspan>#@@@@#<tspan class="red">=-</tspan>@<tspan class="red">+++-.</tspan>@%</tspan>
+    <tspan x="50" y="430">        @@<tspan class="green">=-</tspan>@<tspan class="green">:++:*</tspan>#<tspan class="red">-++=</tspan>@<tspan class="red">=:=</tspan>#</tspan>
+    <tspan x="50" y="450">           @@<tspan class="green">-:::%</tspan>@<tspan class="red">==-:</tspan>%%</tspan>
+    <tspan x="50" y="470">              @@<tspan class="green">:+</tspan>*<tspan class="red">:%</tspan>@</tspan>
+    <tspan x="50" y="490">                  *</tspan>
+</text>
+<text x="400" y="35" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="35">Qian Qian "Cubik" -—- @Cubik65536 -——————————————————————————————-—-</tspan>
+</text>
+<text x="400" y="60" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="60">. <tspan class="key">OS</tspan>: .................................<tspan class="value">Windows 10, Android 14, Linux</tspan></tspan>
+</text>
+<text x="400" y="82" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="82">. <tspan class="key">Uptime</tspan>: .................................<tspan class="value">4 years, 8 months, 7 days</tspan></tspan>
+</text>
+<text x="400" y="104" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="104">. <tspan class="key">Host</tspan>: .................................<tspan class="value">iXOR Technology (@iXORTech)</tspan></tspan>
+</text>
+<text x="400" y="126" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="126">. <tspan class="key">Kernel</tspan>: ...............<tspan class="value">CAM (Computer Aided Manufacturing) Operator</tspan></tspan>
+</text>
+<text x="400" y="148" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="148">. <tspan class="key">IDE</tspan>: .................................<tspan class="value">IDEA 2023.3.2, VSCode 1.96.0</tspan></tspan>
+</text>
+<text x="400" y="192" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="192">. <tspan class="key">Languages.Programming</tspan>: ................<tspan class="value">Kotlin, Java, Python, Shell</tspan></tspan>
+</text>
+<text x="400" y="214" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="214">. <tspan class="key">Languages.Computer</tspan>: ..................<tspan class="value">HTML, CSS, JSON, LaTeX, YAML</tspan></tspan>
+</text>
+<text x="400" y="236" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="236">. <tspan class="key">Languages.Real</tspan>: ..................................<tspan class="value">English, Spanish</tspan></tspan>
+</text>
+<text x="400" y="280" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="280">. <tspan class="key">Hobbies.Software</tspan>: .............<tspan class="value">Minecraft Modding, iOS Jailbreaking</tspan></tspan>
+</text>
+<text x="400" y="302" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="302">. <tspan class="key">Hobbies.Hardware</tspan>: ......................<tspan class="value">Overclocking, Undervolting</tspan></tspan>
+</text>
+<text x="400" y="346" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="346"><tspan class="separator">— Contact ——————————————————————————————————————————————————————————</tspan></tspan>
+</text>
+<text x="400" y="368" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="368">. <tspan class="key">Email.Personal</tspan>: ..............................<tspan class="value">agrantnmac@gmail.com</tspan></tspan>
+</text>
+<text x="400" y="390" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="390">. <tspan class="key">Email.Personal</tspan>: .............................<tspan class="value">andrew@grant.software</tspan></tspan>
+</text>
+<text x="400" y="412" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="412">. <tspan class="key">Email.Work</tspan>: ..............................<tspan class="value">Andrew.Grant@ttmtech.com</tspan></tspan>
+</text>
+<text x="400" y="434" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="434">. <tspan class="key">LinkedIn</tspan>: .............................................<tspan class="value">Andrew6rant</tspan></tspan>
+</text>
+<text x="400" y="456" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="456">. <tspan class="key">Discord</tspan>: ..............................................<tspan class="value">andrew6rant</tspan></tspan>
+</text>
+<text x="400" y="500" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="500"><tspan class="separator">— GitHub Stats —————————————————————————————————————————————————————</tspan></tspan>
+</text>
+<text x="400" y="522" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="522">. <tspan class="key">Repos</tspan>: ........................<tspan class="value">144 {Contributed: 48} | Stars: 1447</tspan></tspan>
+</text>
+<text x="400" y="544" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="544">. <tspan class="key">Commits</tspan>: ...................................<tspan class="value">3,910 | Followers: 157</tspan></tspan>
+</text>
+<text x="400" y="566" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="566">. <tspan class="key">Lines of Code on GitHub</tspan>: ..<tspan class="value">5,253,995 ( <tspan class="addColor">7,880,925++</tspan>,  <tspan class="delColor">2,626,930--</tspan> )</tspan></tspan>
+</text><g transform="translate(400, 603)">  <rect x="0" y="0" width="132.9" height="10" fill="#A97BFF" rx="1"/>  <rect x="132.89406126989562" y="0" width="67.2" height="10" fill="#b07219" rx="1"/>  <rect x="200.0684579839124" y="0" width="59.1" height="10" fill="#3572A5" rx="1"/>  <rect x="259.19904158822527" y="0" width="47.2" height="10" fill="#89e051" rx="1"/>  <rect x="306.34947800787273" y="0" width="29.4" height="10" fill="#3178c6" rx="1"/>  <rect x="335.700838610303" y="0" width="28.3" height="10" fill="#dea584" rx="1"/>  <rect x="364.0253294540476" y="0" width="22.5" height="10" fill="#e34c26" rx="1"/>  <rect x="386.53089166524046" y="0" width="20.3" height="10" fill="#f34b7d" rx="1"/>  <rect x="406.8115693992812" y="0" width="19.4" height="10" fill="#F05138" rx="1"/>  <rect x="426.23652233441726" y="0" width="15.0" height="10" fill="#41b883" rx="1"/>  <rect x="441.21170631524905" y="0" width="11.0" height="10" fill="#663399" rx="1"/>  <rect x="452.2505562211193" y="0" width="9.2" height="10" fill="#f1e05a" rx="1"/>  <rect x="461.40681156939934" y="0" width="8.1" height="10" fill="#ff6347" rx="1"/>  <rect x="469.53619715899373" y="0" width="8.1" height="10" fill="#a91e50" rx="1"/>  <rect x="477.6655827485881" y="0" width="6.5" height="10" fill="#c6538c" rx="1"/>  <rect x="484.1690912202636" y="0" width="2.7" height="10" fill="#000080" rx="1"/>  <rect x="486.9074105767586" y="0" width="2.4" height="10" fill="#c22d40" rx="1"/>  <rect x="489.30344001369167" y="0" width="2.3" height="10" fill="#178600" rx="1"/>  <rect x="491.6138969707343" y="0" width="1.9" height="10" fill="#4298b8" rx="1"/>  <rect x="493.49649152832455" y="0" width="1.6" height="10" fill="#fcb32c" rx="1"/>  <rect x="495.12236864624344" y="0" width="1.5" height="10" fill="#438eff" rx="1"/></g>
+<text x="400" y="628" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="628">  <tspan style="fill:#A97BFF">●</tspan> <tspan class="key">Kotlin</tspan>: <tspan class="value">26.6%</tspan> <tspan class="value">1,553 commits</tspan> <tspan class="value">(+417,137 -139,041)</tspan></tspan>
+</text>
+<text x="400" y="650" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="650">  <tspan style="fill:#b07219">●</tspan> <tspan class="key">Java</tspan>: <tspan class="value">13.4%</tspan> <tspan class="value">785 commits</tspan> <tspan class="value">(+979,558 -326,515)</tspan></tspan>
+</text>
+<text x="400" y="672" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="672">  <tspan style="fill:#3572A5">●</tspan> <tspan class="key">Python</tspan>: <tspan class="value">11.8%</tspan> <tspan class="value">691 commits</tspan> <tspan class="value">(+61,130 -20,375)</tspan></tspan>
+</text>
+<text x="400" y="694" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="694">  <tspan style="fill:#89e051">●</tspan> <tspan class="key">Shell</tspan>: <tspan class="value">9.4%</tspan> <tspan class="value">551 commits</tspan> <tspan class="value">(+21,385 -7,127)</tspan></tspan>
+</text>
+<text x="400" y="716" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="716">  <tspan style="fill:#3178c6">●</tspan> <tspan class="key">TypeScript</tspan>: <tspan class="value">5.9%</tspan> <tspan class="value">343 commits</tspan> <tspan class="value">(+422,822 -140,939)</tspan></tspan>
+</text>
+<text x="400" y="738" fill="#c9d1d9" font-size="14px">
+<tspan x="400" y="738">  <tspan style="fill:#dea584">●</tspan> <tspan class="key">Rust</tspan>: <tspan class="value">5.7%</tspan> <tspan class="value">331 commits</tspan> <tspan class="value">(+44,309 -14,768)</tspan></tspan>
+</text>
+</svg>

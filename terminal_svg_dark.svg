@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg" style="background-color: transparent;">
+  <rect width="800" height="600" fill="#0d1117" rx="6" />
+  <rect x="20" y="20" width="760" height="560" fill="#161b22" stroke="#30363d" stroke-width="1" rx="6" />
+  <rect x="20" y="20" width="760" height="30" fill="#30363d" rx="6 6 0 0" />
+  <circle cx="35" cy="35" r="4" fill="#ff5f56" />
+  <circle cx="50" cy="35" r="4" fill="#ffbd2e" />
+  <circle cx="65" cy="35" r="4" fill="#27ca3f" />
+  <text x="400" y="40" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="12" fill="#e6edf3" text-anchor="middle" font-weight="500">Cubik65536@github:~$ github-stats</text>
+  <text x="40" y="70" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="600">┌─ GitHub Stats ──────────────────────────────────────────────────┐</text>
+  <text x="40" y="84" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="98" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  👤 Qian Qian "Cubik"‎ (@Cubik65536) - Joined 2020              │</text>
+  <text x="40" y="112" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#8b949e" font-weight="400">│  📝 Developer, Tech Enthusiast. Founder @iXORTech @FOS...       │</text>
+  <text x="40" y="126" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#8b949e" font-weight="400">│  📍 Montreal, Quebec, Canada                                    │</text>
+  <text x="40" y="140" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="154" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#2f81f7" font-weight="600">│  📊 Repository Stats:                                           │</text>
+  <text x="40" y="168" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│     Public Repos: 30 │ Total Stars: 23 │ Forks: 14             │</text>
+  <text x="40" y="182" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│     Followers: 157 │ Following: 448                            │</text>
+  <text x="40" y="196" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="210" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#2ea043" font-weight="600">│  🚀 Contribution Stats:                                        │</text>
+  <text x="40" y="224" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│     Commits: 3582 │ Issues: 71 │ PRs: 118                      │</text>
+  <text x="40" y="238" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│     Reviews: 88 │ Repositories: 106                            │</text>
+  <text x="40" y="252" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="266" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#fb8500" font-weight="600">│  💻 Language Analysis (by commit percentage):                  │</text>
+  <text x="40" y="280" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│  ═══════════════════════════════════════════════════════════   │</text>
+  <text x="40" y="294" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Kotlin 763 commits (21.3%)                                  │</text>
+  <circle cx="45" cy="298" r="3" fill="#A97BFF" />
+  <text x="40" y="308" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Java 392 commits (11.0%)                                    │</text>
+  <circle cx="45" cy="312" r="3" fill="#b07219" />
+  <text x="40" y="322" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Python 331 commits (9.2%)                                   │</text>
+  <circle cx="45" cy="326" r="3" fill="#3572A5" />
+  <text x="40" y="336" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Shell 279 commits (7.8%)                                    │</text>
+  <circle cx="45" cy="340" r="3" fill="#89e051" />
+  <text x="40" y="350" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● TypeScript 173 commits (4.9%)                               │</text>
+  <circle cx="45" cy="354" r="3" fill="#3178c6" />
+  <text x="40" y="364" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Rust 157 commits (4.4%)                                     │</text>
+  <circle cx="45" cy="368" r="3" fill="#dea584" />
+  <text x="40" y="378" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● HTML 132 commits (3.7%)                                     │</text>
+  <circle cx="45" cy="382" r="3" fill="#e34c26" />
+  <text x="40" y="392" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● C++ 124 commits (3.5%)                                      │</text>
+  <circle cx="45" cy="396" r="3" fill="#f34b7d" />
+  <text x="40" y="406" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● Swift 112 commits (3.1%)                                    │</text>
+  <circle cx="45" cy="410" r="3" fill="#F05138" />
+  <text x="40" y="420" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│  ● JavaScript 96 commits (2.7%)                                │</text>
+  <circle cx="45" cy="424" r="3" fill="#f1e05a" />
+  <text x="40" y="434" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="448" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#2f81f7" font-weight="600">│  📈 Code Statistics:                                           │</text>
+  <text x="40" y="462" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#e6edf3" font-weight="400">│     Lines Added: 894,543 │ Deleted: 189,607                    │</text>
+  <text x="40" y="476" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#2ea043" font-weight="400">│     Net Change: +704,936 lines                                 │</text>
+  <text x="40" y="490" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="400">│                                                                 │</text>
+  <text x="40" y="504" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#30363d" font-weight="600">└─────────────────────────────────────────────────────────────────┘</text>
+  <text x="40" y="518" font-family="SF Mono, Monaco, Inconsolata, Roboto Mono, monospace" font-size="11" fill="#7c3aed" font-weight="400">Cubik65536@github:~$ # Generated on 2025-06-18 04:31:29 UTC</text>
+  <rect x="394" y="520" width="8" height="12" fill="#f0f6fc">
+    <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
+  </rect>
+</svg>
