@@ -896,7 +896,7 @@ class GitHubProfileGenerator:
 
         # Use the global constants for dimensions
         svg_width = SVG_WIDTH
-        line_height = 22
+        line_height = 18
         ascii_height = 460  # Height of ASCII art section
         top_margin = 35
 
@@ -920,8 +920,6 @@ class GitHubProfileGenerator:
 
         # Calculate content height including notes and prompt at the bottom
         content_height = (
-                top_margin +  # Initial margin
-                25 +  # Space after user header
                 (total_content_lines * line_height) +  # All text lines
                 10 +  # Language bar height
                 35 +  # Space between language bar and language details (increased from 25)
@@ -938,7 +936,7 @@ class GitHubProfileGenerator:
         if SVG_HEIGHT is not None:
             svg_height = SVG_HEIGHT
         else:
-            svg_height = max(ascii_height + top_margin, content_height) + 10
+            svg_height = max(ascii_height + top_margin, content_height) + 5
 
         print(f"Debug: Content lines: {len(content_lines)}, Language details: {language_details_count}")
         print(f"Debug: Total lines: {total_content_lines}, SVG height: {svg_height}")
