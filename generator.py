@@ -87,7 +87,7 @@ LANGUAGE_COLORS = {
 }
 
 
-def get_profile_content_definition(user_data, top_languages):
+def get_profile_content_definition(user_data):
     """
     Define the content structure for the profile.
 
@@ -126,11 +126,10 @@ def get_profile_content_definition(user_data, top_languages):
 
     # System info section
     content_lines.extend([
-        ("OS", "Windows 10, Android 14, Linux"),
         ("Uptime", f"{years} years, {months} months, {days} days"),
-        ("Host", user_data.get("company", "TTM Technologies, Inc.") or "TTM Technologies, Inc."),
-        ("Kernel", "CAM (Computer Aided Manufacturing) Operator"),
-        ("IDE", "IDEA 2023.3.2, VSCode 1.96.0"),
+        ("OS", "macOS 26 Tahoe, Windows 11, Fedora 42"),
+        ("Editors", "NeoVim, Visual Studio Code"),
+        ("IDE", "Xcode, IntelliJ IDEA"),
     ])
 
     # Add gap before languages section
@@ -138,9 +137,9 @@ def get_profile_content_definition(user_data, top_languages):
 
     # Languages section
     content_lines.extend([
-        ("Languages.Programming", ", ".join(top_languages) if top_languages else "Java, Python, JavaScript, C++"),
-        ("Languages.Computer", "HTML, CSS, JSON, LaTeX, YAML"),
-        ("Languages.Real", "English, Spanish"),
+        ("Languages.Programming", "Kotlin, Java, Python, Rust, Shell"),
+        ("Languages.Markup", "HTML, CSS, Markdown, Typst, LaTeX"),
+        ("Languages.Real", "Chinese, English, French"),
     ])
 
     # Add gap before hobbies section
@@ -160,11 +159,11 @@ def get_profile_content_definition(user_data, top_languages):
 
     # Contact info
     content_lines.extend([
-        ("Email.Personal", "agrantnmac@gmail.com"),
-        ("Email.Personal", "andrew@grant.software"),
-        ("Email.Work", "Andrew.Grant@ttmtech.com"),
-        ("LinkedIn", "Andrew6rant"),
-        ("Discord", "andrew6rant"),
+        ("Email.Contact", "me@cubik65536.top"),
+        ("Email.Alternative", "cubik65536@cubik65536.top"),
+        ("Email.Alternative", "cubik65536@proton.me"),
+        ("LinkedIn", "in/qianq"),
+        ("Discord", "Cubik65536"),
     ])
 
     # Add gap and GitHub Statistics section header
@@ -448,15 +447,10 @@ class GitHubProfileGenerator:
             styled_value = f'<tspan class="value">{value}</tspan>'
             return self.format_styled_line_with_truncation(key, styled_value)
 
-    def get_content_lines(self, user, language_percentages):
+    def get_content_lines(self, user):
         """Get content lines using the profile content definition function"""
-        # Top languages for display (up to 4)
-        top_languages = []
-        if language_percentages:
-            top_languages = list(language_percentages.keys())[:4]
-
         # Use the external content definition function
-        base_lines = get_profile_content_definition(user, top_languages)
+        base_lines = get_profile_content_definition(user)
 
         # Process bio line specially and add overflow line if needed
         processed_lines = []
@@ -902,14 +896,14 @@ class GitHubProfileGenerator:
         top_margin = 35
 
         # Dynamically calculate content lines
-        content_lines = self.get_content_lines(user, language_percentages)
+        content_lines = self.get_content_lines(user)
 
         # Count different types of lines
         text_lines_count = len([line for line in content_lines if line[0] != "GAP"])
         gap_lines_count = len([line for line in content_lines if line[0] == "GAP"])
 
-        # Count language details (top 6 languages shown)
-        language_details_count = min(6, len(language_percentages)) if language_percentages else 0
+        # Count language details (top 10 languages shown)
+        language_details_count = min(10, len(language_percentages)) if language_percentages else 0
 
         # Calculate total content lines
         total_content_lines = (
@@ -1093,7 +1087,7 @@ text, tspan {{white-space: pre;}}
             y_current += 35  # Spacing after language bar before language details
 
             # Language details
-            for i, (lang, stats) in enumerate(list(language_percentages.items())[:6]):  # Show top 6 languages
+            for i, (lang, stats) in enumerate(list(language_percentages.items())[:10]):  # Show top 10 languages
                 percentage_str = f"{stats['percentage']:.1f}%"
                 commits_str = f"{stats['commits']:,} commits"
                 lines_str = f"(+{stats['additions']:,} -{stats['deletions']:,})"
@@ -1192,7 +1186,7 @@ def main():
         language_stats = generator.calculate_language_percentages(data['language_stats'])
         if language_stats:
             print(f"\nTop languages:")
-            for i, (lang, stats) in enumerate(list(language_stats.items())[:5]):
+            for i, (lang, stats) in enumerate(list(language_stats.items())[:10]):
                 print(f"  {i + 1}. {lang}: {stats['percentage']:.1f}% ({stats['commits']:,} commits)")
         else:
             print("\nNo language statistics found.")
