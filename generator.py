@@ -4,19 +4,19 @@ GitHub Profile SVG Generator
 Generates neofetch-style profile SVGs with statistics using GitHub GraphQL API
 """
 
-import json
-import requests
 import argparse
 import os
-from datetime import datetime, timedelta
-from collections import defaultdict
-import xml.etree.ElementTree as ET
-import unicodedata
 import re
+import unicodedata
+from collections import defaultdict
+from datetime import datetime, timezone
+
+import requests
 
 # SVG Configuration Constants
 SVG_WIDTH = 1024
 SVG_HEIGHT = None  # Will be calculated dynamically based on content
+ASCII_HEIGHT = 490  # Height of ASCII art section, modify based on the art added
 
 # GitHub language colors (subset - add more as needed)
 LANGUAGE_COLORS = {
@@ -104,7 +104,6 @@ def get_profile_content_definition(user_data):
 
     Args:
         user_data: GitHub user data from API
-        top_languages: List of top programming languages
 
     Returns:
         List of (key, value) tuples defining the profile content
@@ -174,6 +173,307 @@ def get_profile_content_definition(user_data):
     return content_lines
 
 
+def clean_and_visible_length(text):
+    """Clean text of invisible characters and return the visible length"""
+    if not text:
+        return text, 0
+
+    # Remove or normalize invisible characters
+    cleaned = ''
+    for char in text:
+        # Skip zero-width characters and other invisible characters
+        if unicodedata.category(char) in ['Cf', 'Mn', 'Me']:  # Format chars, nonspacing marks, enclosing marks
+            continue
+        # Skip specific invisible characters
+        if char in ['\u200b', '\u200c', '\u200d', '\u2060', '\ufeff', '\u202a', '\u202b', '\u202c', '\u202d',
+                    '\u202e']:
+            continue
+        cleaned += char
+
+    # Calculate visual width (some characters may be wider)
+    visual_length = 0
+    for char in cleaned:
+        # Most characters are width 1, but some CJK characters might be width 2
+        if unicodedata.east_asian_width(char) in ['F', 'W']:  # Fullwidth or Wide
+            visual_length += 2
+        else:
+            visual_length += 1
+
+    return cleaned, visual_length
+
+
+def get_text_length_without_tags(text):
+    """Calculate the text length without XML/HTML tags"""
+    # Remove all XML/HTML tags to get the actual text length
+    clean_text = re.sub(r'<[^>]+>', '', text)
+    return len(clean_text)
+
+
+def format_bio_line(bio_text, total_width=75):
+    """
+    Format bio line with special requirements:
+    1. At least 8 dots
+    2. Respect 75 character width limit
+    3. If overflow, create a second right-aligned line
+    4. Never break words - always break at word boundaries
+
+    Returns: (first_line_formatted, overflow_lines_list)
+    """
+    if not bio_text:
+        bio_text = ""
+
+    key_part = ". Bio:"
+    min_dots = 8
+
+    # Calculate space for first line
+    space_after_key = total_width - len(key_part)
+
+    # If bio fits on first line with minimum dots
+    if len(bio_text) + min_dots <= space_after_key:
+        dots_needed = max(min_dots, space_after_key - len(bio_text) - 1)
+        # Return structured format: (dots_part, bio_text_part)
+        return (dots_needed, bio_text), []
+
+    # If bio needs to overflow to second line
+    # First line gets minimum dots and as much bio as possible without breaking words
+    first_line_bio_space = space_after_key - min_dots - 1  # -1 for space before bio
+
+    if first_line_bio_space > 0:
+        # Find the best place to break without splitting words
+        words = bio_text.split()
+        first_line_bio = ""
+        remaining_words = []
+
+        for i, word in enumerate(words):
+            # Check if adding this word would exceed the space
+            test_line = first_line_bio + (" " if first_line_bio else "") + word
+            if len(test_line) <= first_line_bio_space:
+                first_line_bio = test_line
+            else:
+                # This word would exceed space, so put it and all remaining words on second line
+                remaining_words = words[i:]
+                break
+
+        remaining_bio = " ".join(remaining_words)
+    else:
+        first_line_bio = ""
+        remaining_bio = bio_text
+
+    # Calculate dots needed to fill the 75 character width
+    first_line_length = len(key_part) + min_dots + (1 if first_line_bio else 0) + len(first_line_bio)
+    additional_dots = total_width - first_line_length
+    total_dots = min_dots + additional_dots
+
+    # Return structured format: (dots_count, bio_text_part)
+    first_line_data = (total_dots, first_line_bio)
+
+    # Second line is right-aligned with remaining bio
+    overflow_lines = []
+    if remaining_bio:
+        second_line = remaining_bio.rjust(total_width)
+        overflow_lines = [("BIO_OVERFLOW", second_line)]
+
+    return first_line_data, overflow_lines
+
+
+def format_line(key, value, total_width=75, separator=":"):
+    """Format a line to be exactly the specified width"""
+    # Handle special cases for headers
+    if key.startswith('—') or key.startswith('-'):
+        # This is a header line
+        return key + '—' * (total_width - len(key))
+
+    # Handle bio overflow
+    if key == "BIO_OVERFLOW":
+        return value  # Already formatted as right-aligned
+
+    # Regular key-value pair
+    key_part = f". {key}{separator}"
+    value_part = f" {value}"
+
+    # Calculate dots needed
+    dots_needed = total_width - len(key_part) - len(value_part)
+    if dots_needed < 1:
+        # If too long, truncate value
+        available_for_value = total_width - len(key_part) - 1
+        value_part = f" {value[:available_for_value - 3]}..."
+        dots_needed = 1
+
+    return f"{key_part}{'.' * dots_needed}{value_part}"
+
+
+def format_username_header(full_name, username, total_width=75):
+    """Format the username header line to be exactly the specified width"""
+    # Clean the full name and get its visual length
+    cleaned_name, name_visual_length = clean_and_visible_length(full_name)
+
+    # Format: "Full Name -—- @username -——————————————————————-—-"
+    username_part = f"@{username}"
+    fixed_parts = " -—- " + username_part + " -"  # The fixed separator parts
+    end_part = "—-—-"
+
+    # Calculate visual length needed
+    fixed_length = len(fixed_parts) + len(end_part)
+    available_for_name = total_width - fixed_length
+
+    # If the cleaned name is too long, truncate it
+    if name_visual_length > available_for_name:
+        # Truncate character by character until it fits
+        truncated_name = ""
+        current_length = 0
+        for char in cleaned_name:
+            char_width = 2 if unicodedata.east_asian_width(char) in ['F', 'W'] else 1
+            if current_length + char_width + 3 > available_for_name:  # +3 for "..."
+                truncated_name += "..."
+                break
+            truncated_name += char
+            current_length += char_width
+        cleaned_name = truncated_name
+        name_visual_length = current_length + (3 if truncated_name.endswith("...") else 0)
+
+    start_part = cleaned_name + fixed_parts
+
+    # Calculate how many — characters needed in the middle
+    middle_dashes_needed = total_width - len(start_part) - len(end_part)
+
+    # Adjust for visual length differences (if any wide characters affect the calculation)
+    visual_adjustment = name_visual_length - len(cleaned_name.replace("...", "")) - (
+        3 if "..." in cleaned_name else 0)
+    middle_dashes_needed -= visual_adjustment
+
+    if middle_dashes_needed < 0:
+        middle_dashes_needed = 0
+
+    return f"{start_part}{'—' * middle_dashes_needed}{end_part}"
+
+
+def format_styled_line_with_truncation(key, value, total_width=75):
+    """Format a styled line with proper truncation that preserves XML structure"""
+    # Handle headers first
+    if key.startswith('—') or key.startswith('-'):
+        header_line = key + '—' * (total_width - len(key))
+        return f'<tspan class="separator">{header_line}</tspan>'
+
+    # Handle bio overflow
+    if key == "BIO_OVERFLOW":
+        return f'<tspan class="value">{value}</tspan>'
+
+    # For styled content, check the actual text length without styling tags
+    key_part = f". {key}:"
+    text_length = get_text_length_without_tags(value)
+
+    # Calculate available space for the value part
+    available_for_value = total_width - len(key_part) - 1  # -1 for minimum dots
+
+    # If text is too long, create a simpler version without complex styling
+    if text_length > available_for_value:
+        # For very long content, create a simplified version
+        simple_value = re.sub(r'<[^>]+>', '', value)  # Strip all tags
+        if len(simple_value) > available_for_value:
+            simple_value = simple_value[:available_for_value - 3] + "..."
+        styled_value = f'<tspan class="value">{simple_value}</tspan>'
+        dots_needed = max(1, total_width - len(key_part) - len(simple_value) - 1)
+    else:
+        styled_value = value
+        dots_needed = max(1, total_width - len(key_part) - text_length - 1)
+
+    dots = '.' * dots_needed
+
+    return f'. <tspan class="key">{key}</tspan>:{dots} {styled_value}'
+
+
+def get_content_lines(user):
+    """Get content lines using the profile content definition function"""
+    # Use the external content definition function
+    base_lines = get_profile_content_definition(user)
+
+    # Process bio line specially and add overflow line if needed
+    processed_lines = []
+    for key, value in base_lines:
+        if key == "Bio":
+            bio_data, overflow_lines = format_bio_line(value)
+            # Store bio data as tuple (dots_count, bio_text)
+            processed_lines.append(("Bio", bio_data))
+            # Add overflow lines if any
+            for overflow_key, overflow_value in overflow_lines:
+                processed_lines.append((overflow_key, overflow_value))
+        else:
+            processed_lines.append((key, value))
+
+    return processed_lines
+
+
+def format_styled_line(key, value, special_styling=None):
+    """Format and style a line in one step"""
+    # Handle headers first
+    if key.startswith('—') or key.startswith('-'):
+        header_line = key + '—' * (75 - len(key))
+        return f'<tspan class="separator">{header_line}</tspan>'
+
+    # Handle bio overflow
+    if key == "BIO_OVERFLOW":
+        return f'<tspan class="value">{value}</tspan>'
+
+    # Apply special styling if provided
+    if special_styling and key in special_styling:
+        styled_value = special_styling[key](value)
+        return format_styled_line_with_truncation(key, styled_value)
+    else:
+        styled_value = f'<tspan class="value">{value}</tspan>'
+        return format_styled_line_with_truncation(key, styled_value)
+
+
+def calculate_account_age_years(created_at):
+    """Calculate the age of the GitHub account in years"""
+    created_date = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+    current_date = datetime.now(created_date.tzinfo)
+    age = current_date - created_date
+    return max(1, age.days // 365 + 1)  # At least 1 year, round up
+
+
+def calculate_language_percentages(language_stats):
+    """Calculate language usage percentages based on commits"""
+    total_commits = sum(lang['commits'] for lang in language_stats.values())
+    if total_commits == 0:
+        return {}
+
+    percentages = {}
+    for lang, stats in language_stats.items():
+        if stats['commits'] > 0:
+            percentages[lang] = {
+                'percentage': (stats['commits'] / total_commits) * 100,
+                'commits': stats['commits'],
+                'additions': stats['additions'],
+                'deletions': stats['deletions'],
+                'net': stats['additions'] - stats['deletions'],
+                'color': stats['color']
+            }
+
+    # Sort by percentage
+    return dict(sorted(percentages.items(), key=lambda x: x[1]['percentage'], reverse=True))
+
+
+def generate_language_bar(language_percentages, width=400):
+    """Generate SVG elements for language progress bar"""
+    if not language_percentages:
+        return []
+
+    elements = []
+    x_offset = 0
+
+    for lang, stats in language_percentages.items():
+        segment_width = (stats['percentage'] / 100) * width
+        if segment_width < 1:  # Skip very small segments
+            continue
+
+        # Create colored rectangle for this language
+        rect = f'<rect x="{x_offset}" y="0" width="{segment_width:.1f}" height="10" fill="{stats["color"]}" rx="1"/>'
+        elements.append(rect)
+        x_offset += segment_width
+
+    return elements
+
+
 class GitHubProfileGenerator:
     def __init__(self, token, username):
         self.token = token
@@ -183,40 +483,6 @@ class GitHubProfileGenerator:
             'Content-Type': 'application/json',
         }
         self.graphql_url = 'https://api.github.com/graphql'
-
-    def clean_and_visible_length(self, text):
-        """Clean text of invisible characters and return the visible length"""
-        if not text:
-            return text, 0
-
-        # Remove or normalize invisible characters
-        cleaned = ''
-        for char in text:
-            # Skip zero-width characters and other invisible characters
-            if unicodedata.category(char) in ['Cf', 'Mn', 'Me']:  # Format chars, nonspacing marks, enclosing marks
-                continue
-            # Skip specific invisible characters
-            if char in ['\u200b', '\u200c', '\u200d', '\u2060', '\ufeff', '\u202a', '\u202b', '\u202c', '\u202d',
-                        '\u202e']:
-                continue
-            cleaned += char
-
-        # Calculate visual width (some characters may be wider)
-        visual_length = 0
-        for char in cleaned:
-            # Most characters are width 1, but some CJK characters might be width 2
-            if unicodedata.east_asian_width(char) in ['F', 'W']:  # Fullwidth or Wide
-                visual_length += 2
-            else:
-                visual_length += 1
-
-        return cleaned, visual_length
-
-    def get_text_length_without_tags(self, text):
-        """Calculate the text length without XML/HTML tags"""
-        # Remove all XML/HTML tags to get the actual text length
-        clean_text = re.sub(r'<[^>]+>', '', text)
-        return len(clean_text)
 
     def check_is_authenticated_user(self, username):
         """Check if the token's authenticated user matches the provided username"""
@@ -245,225 +511,11 @@ class GitHubProfileGenerator:
                     authenticated_username = data['data']['viewer'].get('login')
                     # Case-insensitive comparison since GitHub usernames are case-insensitive
                     return authenticated_username and authenticated_username.lower() == username.lower()
-        except:
+        except requests.RequestException as e:
+            print(f"Error checking authenticated user: {e}")
             pass
 
         return False
-
-    def format_bio_line(self, bio_text, total_width=75):
-        """
-        Format bio line with special requirements:
-        1. At least 8 dots
-        2. Respect 75 character width limit
-        3. If overflow, create a second right-aligned line
-        4. Never break words - always break at word boundaries
-
-        Returns: (first_line_formatted, overflow_lines_list)
-        """
-        if not bio_text:
-            bio_text = ""
-
-        key_part = ". Bio:"
-        min_dots = 8
-
-        # Calculate space for first line
-        space_after_key = total_width - len(key_part)
-
-        # If bio fits on first line with minimum dots
-        if len(bio_text) + min_dots <= space_after_key:
-            dots_needed = max(min_dots, space_after_key - len(bio_text) - 1)
-            # Return structured format: (dots_part, bio_text_part)
-            return (dots_needed, bio_text), []
-
-        # If bio needs to overflow to second line
-        # First line gets minimum dots and as much bio as possible without breaking words
-        first_line_bio_space = space_after_key - min_dots - 1  # -1 for space before bio
-
-        if first_line_bio_space > 0:
-            # Find the best place to break without splitting words
-            words = bio_text.split()
-            first_line_bio = ""
-            remaining_words = []
-
-            for i, word in enumerate(words):
-                # Check if adding this word would exceed the space
-                test_line = first_line_bio + (" " if first_line_bio else "") + word
-                if len(test_line) <= first_line_bio_space:
-                    first_line_bio = test_line
-                else:
-                    # This word would exceed space, so put it and all remaining words on second line
-                    remaining_words = words[i:]
-                    break
-
-            remaining_bio = " ".join(remaining_words)
-        else:
-            first_line_bio = ""
-            remaining_bio = bio_text
-
-        # Calculate dots needed to fill the 75 character width
-        first_line_length = len(key_part) + min_dots + (1 if first_line_bio else 0) + len(first_line_bio)
-        additional_dots = total_width - first_line_length
-        total_dots = min_dots + additional_dots
-
-        # Return structured format: (dots_count, bio_text_part)
-        first_line_data = (total_dots, first_line_bio)
-
-        # Second line is right-aligned with remaining bio
-        overflow_lines = []
-        if remaining_bio:
-            second_line = remaining_bio.rjust(total_width)
-            overflow_lines = [("BIO_OVERFLOW", second_line)]
-
-        return first_line_data, overflow_lines
-
-    def format_line(self, key, value, total_width=75, separator=":"):
-        """Format a line to be exactly the specified width"""
-        # Handle special cases for headers
-        if key.startswith('—') or key.startswith('-'):
-            # This is a header line
-            return key + '—' * (total_width - len(key))
-
-        # Handle bio overflow
-        if key == "BIO_OVERFLOW":
-            return value  # Already formatted as right-aligned
-
-        # Regular key-value pair
-        key_part = f". {key}{separator}"
-        value_part = f" {value}"
-
-        # Calculate dots needed
-        dots_needed = total_width - len(key_part) - len(value_part)
-        if dots_needed < 1:
-            # If too long, truncate value
-            available_for_value = total_width - len(key_part) - 1
-            value_part = f" {value[:available_for_value - 3]}..."
-            dots_needed = 1
-
-        return f"{key_part}{'.' * dots_needed}{value_part}"
-
-    def format_username_header(self, full_name, username, total_width=75):
-        """Format the username header line to be exactly the specified width"""
-        # Clean the full name and get its visual length
-        cleaned_name, name_visual_length = self.clean_and_visible_length(full_name)
-
-        # Format: "Full Name -—- @username -——————————————————————-—-"
-        username_part = f"@{username}"
-        fixed_parts = " -—- " + username_part + " -"  # The fixed separator parts
-        end_part = "—-—-"
-
-        # Calculate visual length needed
-        fixed_length = len(fixed_parts) + len(end_part)
-        available_for_name = total_width - fixed_length
-
-        # If the cleaned name is too long, truncate it
-        if name_visual_length > available_for_name:
-            # Truncate character by character until it fits
-            truncated_name = ""
-            current_length = 0
-            for char in cleaned_name:
-                char_width = 2 if unicodedata.east_asian_width(char) in ['F', 'W'] else 1
-                if current_length + char_width + 3 > available_for_name:  # +3 for "..."
-                    truncated_name += "..."
-                    break
-                truncated_name += char
-                current_length += char_width
-            cleaned_name = truncated_name
-            name_visual_length = current_length + (3 if truncated_name.endswith("...") else 0)
-
-        start_part = cleaned_name + fixed_parts
-
-        # Calculate how many — characters needed in the middle
-        middle_dashes_needed = total_width - len(start_part) - len(end_part)
-
-        # Adjust for visual length differences (if any wide characters affect the calculation)
-        visual_adjustment = name_visual_length - len(cleaned_name.replace("...", "")) - (
-            3 if "..." in cleaned_name else 0)
-        middle_dashes_needed -= visual_adjustment
-
-        if middle_dashes_needed < 0:
-            middle_dashes_needed = 0
-
-        return f"{start_part}{'—' * middle_dashes_needed}{end_part}"
-
-    def format_styled_line_with_truncation(self, key, value, total_width=75):
-        """Format a styled line with proper truncation that preserves XML structure"""
-        # Handle headers first
-        if key.startswith('—') or key.startswith('-'):
-            header_line = key + '—' * (total_width - len(key))
-            return f'<tspan class="separator">{header_line}</tspan>'
-
-        # Handle bio overflow
-        if key == "BIO_OVERFLOW":
-            return f'<tspan class="value">{value}</tspan>'
-
-        # For styled content, check the actual text length without styling tags
-        key_part = f". {key}:"
-        text_length = self.get_text_length_without_tags(value)
-
-        # Calculate available space for the value part
-        available_for_value = total_width - len(key_part) - 1  # -1 for minimum dots
-
-        # If text is too long, create a simpler version without complex styling
-        if text_length > available_for_value:
-            # For very long content, create a simplified version
-            simple_value = re.sub(r'<[^>]+>', '', value)  # Strip all tags
-            if len(simple_value) > available_for_value:
-                simple_value = simple_value[:available_for_value - 3] + "..."
-            styled_value = f'<tspan class="value">{simple_value}</tspan>'
-            dots_needed = max(1, total_width - len(key_part) - len(simple_value) - 1)
-        else:
-            styled_value = value
-            dots_needed = max(1, total_width - len(key_part) - text_length - 1)
-
-        dots = '.' * dots_needed
-
-        return f'. <tspan class="key">{key}</tspan>:{dots} {styled_value}'
-
-    def format_styled_line(self, key, value, special_styling=None):
-        """Format and style a line in one step"""
-        # Handle headers first
-        if key.startswith('—') or key.startswith('-'):
-            header_line = key + '—' * (75 - len(key))
-            return f'<tspan class="separator">{header_line}</tspan>'
-
-        # Handle bio overflow
-        if key == "BIO_OVERFLOW":
-            return f'<tspan class="value">{value}</tspan>'
-
-        # Apply special styling if provided
-        if special_styling and key in special_styling:
-            styled_value = special_styling[key](value)
-            return self.format_styled_line_with_truncation(key, styled_value)
-        else:
-            styled_value = f'<tspan class="value">{value}</tspan>'
-            return self.format_styled_line_with_truncation(key, styled_value)
-
-    def get_content_lines(self, user):
-        """Get content lines using the profile content definition function"""
-        # Use the external content definition function
-        base_lines = get_profile_content_definition(user)
-
-        # Process bio line specially and add overflow line if needed
-        processed_lines = []
-        for key, value in base_lines:
-            if key == "Bio":
-                bio_data, overflow_lines = self.format_bio_line(value)
-                # Store bio data as tuple (dots_count, bio_text)
-                processed_lines.append(("Bio", bio_data))
-                # Add overflow lines if any
-                for overflow_key, overflow_value in overflow_lines:
-                    processed_lines.append((overflow_key, overflow_value))
-            else:
-                processed_lines.append((key, value))
-
-        return processed_lines
-
-    def calculate_account_age_years(self, created_at):
-        """Calculate the age of the GitHub account in years"""
-        created_date = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-        current_date = datetime.now(created_date.tzinfo)
-        age = current_date - created_date
-        return max(1, age.days // 365 + 1)  # At least 1 year, round up
 
     def get_user_data_multi_year(self, years_back=None):
         """Fetch user data across multiple years including detailed issue and PR statistics with draft PRs"""
@@ -544,10 +596,8 @@ class GitHubProfileGenerator:
 
         # If years_back is not provided, calculate based on account age
         if years_back is None:
-            years_back = self.calculate_account_age_years(user_data['createdAt'])
+            years_back = calculate_account_age_years(user_data['createdAt'])
             print(f"✓ Using account age: {years_back} years")
-
-        start_date = end_date - timedelta(days=365 * years_back)
 
         # Debug: Print the PR counts from GraphQL
         merged_prs_count = user_data.get('mergedPullRequests', {}).get('totalCount', 0)
@@ -718,47 +768,6 @@ class GitHubProfileGenerator:
             'contributions_data': contributions_data
         }
 
-    def calculate_language_percentages(self, language_stats):
-        """Calculate language usage percentages based on commits"""
-        total_commits = sum(lang['commits'] for lang in language_stats.values())
-        if total_commits == 0:
-            return {}
-
-        percentages = {}
-        for lang, stats in language_stats.items():
-            if stats['commits'] > 0:
-                percentages[lang] = {
-                    'percentage': (stats['commits'] / total_commits) * 100,
-                    'commits': stats['commits'],
-                    'additions': stats['additions'],
-                    'deletions': stats['deletions'],
-                    'net': stats['additions'] - stats['deletions'],
-                    'color': stats['color']
-                }
-
-        # Sort by percentage
-        return dict(sorted(percentages.items(), key=lambda x: x[1]['percentage'], reverse=True))
-
-    def generate_language_bar(self, language_percentages, width=400):
-        """Generate SVG elements for language progress bar"""
-        if not language_percentages:
-            return []
-
-        elements = []
-        x_offset = 0
-
-        for lang, stats in language_percentages.items():
-            segment_width = (stats['percentage'] / 100) * width
-            if segment_width < 1:  # Skip very small segments
-                continue
-
-            # Create colored rectangle for this language
-            rect = f'<rect x="{x_offset}" y="0" width="{segment_width:.1f}" height="10" fill="{stats["color"]}" rx="1"/>'
-            elements.append(rect)
-            x_offset += segment_width
-
-        return elements
-
     def generate_macos_window(self, content_svg, mode='dark'):
         """Wrap the content in a macOS-style window with only top titlebar"""
         if mode == 'dark':
@@ -855,7 +864,7 @@ class GitHubProfileGenerator:
     def generate_svg(self, data, mode='dark', macos_window=False):
         """Generate the complete SVG"""
         user = data['user']
-        language_percentages = self.calculate_language_percentages(data['language_stats'])
+        language_percentages = calculate_language_percentages(data['language_stats'])
 
         # Calculate total lines of code
         total_additions = sum(lang['additions'] for lang in data['language_stats'].values())
@@ -897,11 +906,10 @@ class GitHubProfileGenerator:
         # Use the global constants for dimensions
         svg_width = SVG_WIDTH
         line_height = 18
-        ascii_height = 460  # Height of ASCII art section
         top_margin = 35
 
         # Dynamically calculate content lines
-        content_lines = self.get_content_lines(user)
+        content_lines = get_content_lines(user)
 
         # Count different types of lines
         text_lines_count = len([line for line in content_lines if line[0] != "GAP"])
@@ -936,7 +944,7 @@ class GitHubProfileGenerator:
         if SVG_HEIGHT is not None:
             svg_height = SVG_HEIGHT
         else:
-            svg_height = max(ascii_height + top_margin, content_height) + 5
+            svg_height = max(ASCII_HEIGHT + top_margin, content_height) + 5
 
         print(f"Debug: Content lines: {len(content_lines)}, Language details: {language_details_count}")
         print(f"Debug: Total lines: {total_content_lines}, SVG height: {svg_height}")
@@ -1012,7 +1020,7 @@ text, tspan {{white-space: pre;}}
         username = user.get('login', 'Unknown')
 
         # Always use the dash format for every username
-        header_line = self.format_username_header(display_name, username, 75)
+        header_line = format_username_header(display_name, username, 75)
 
         svg_content += f'''
 <text x="{x_main}" y="{y_start}" fill="{text_color}" font-size="14px">
@@ -1068,9 +1076,9 @@ text, tspan {{white-space: pre;}}
             # Replace placeholder values for GitHub Statistics - just pass placeholders as special styling handles the formatting
             elif key in ["Repository", "Commits", "Issues", "Pull Requests"]:
                 value = "PLACEHOLDER"  # Will be replaced by special styling
-                styled_line = self.format_styled_line(key, value, special_styling)
+                styled_line = format_styled_line(key, value, special_styling)
             else:
-                styled_line = self.format_styled_line(key, value, special_styling)
+                styled_line = format_styled_line(key, value, special_styling)
 
             svg_content += f'''
 <text x="{x_main}" y="{y_current}" fill="{text_color}" font-size="14px">
@@ -1082,7 +1090,7 @@ text, tspan {{white-space: pre;}}
         if language_percentages:
             # Add progress bar - width 560
             svg_content += f'<g transform="translate({x_main}, {y_current})">'
-            bar_elements = self.generate_language_bar(language_percentages, 560)
+            bar_elements = generate_language_bar(language_percentages, 560)
             for element in bar_elements:
                 svg_content += f'  {element}'
             svg_content += '</g>'
@@ -1105,7 +1113,7 @@ text, tspan {{white-space: pre;}}
         y_current += 20  # Space before notes
 
         # Generate timestamp (current UTC time)
-        current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
         # Add generation timestamp note
         svg_content += f'''
@@ -1124,7 +1132,7 @@ text, tspan {{white-space: pre;}}
 </text>'''
 
         # Add shell prompt with flashing cursor
-        y_current += 25  # Increased space before prompt (from 15 to 25)
+        y_current += 25
         prompt_text = f"{self.username}@github.com:~$"
 
         svg_content += f'''
@@ -1186,7 +1194,7 @@ def main():
         print(f"Light mode: {args.output_light}")
 
         # Print some statistics
-        language_stats = generator.calculate_language_percentages(data['language_stats'])
+        language_stats = calculate_language_percentages(data['language_stats'])
         if language_stats:
             print(f"\nTop languages:")
             for i, (lang, stats) in enumerate(list(language_stats.items())[:10]):
