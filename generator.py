@@ -142,15 +142,6 @@ def get_profile_content_definition(user_data):
         ("Languages.Real", "Chinese, English, French"),
     ])
 
-    # Add gap before hobbies section
-    content_lines.append(("GAP", ""))
-
-    # Hobbies section
-    content_lines.extend([
-        ("Hobbies.Software", "Minecraft Modding, iOS Jailbreaking"),
-        ("Hobbies.Hardware", "Overclocking, Undervolting"),
-    ])
-
     # Add gap and Contact section header
     content_lines.extend([
         ("GAP", ""),
