@@ -263,7 +263,7 @@ class GitHubProfileGenerator:
     def format_bio_line(self, bio_text, total_width=75):
         """
         Format bio line with special requirements:
-        1. At least 16 dots
+        1. At least 8 dots
         2. Respect 75 character width limit
         3. If overflow, create a second right-aligned line
         4. Never break words - always break at word boundaries
@@ -274,7 +274,7 @@ class GitHubProfileGenerator:
             bio_text = ""
 
         key_part = ". Bio:"
-        min_dots = 16
+        min_dots = 8
 
         # Calculate space for first line
         space_after_key = total_width - len(key_part)
