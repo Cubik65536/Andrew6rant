@@ -770,8 +770,9 @@ class GitHubProfileGenerator:
             title_text_color = '#1d1d1f'
             shadow_color = '#00000040'
 
-        # Window dimensions - no side or bottom padding
+        # Window dimensions
         titlebar_height = 28
+        bottom_padding = 28  # Added padding for bottom corner radius
         traffic_light_size = 12
         traffic_light_spacing = 8
 
@@ -785,9 +786,17 @@ class GitHubProfileGenerator:
         if height_match:
             content_height = int(height_match.group(1))
 
-        # Calculate window dimensions - same width as content, add only titlebar height
+        # Extract background color from content SVG
+        bg_color = '#0d1117'  # Default dark background
+        if mode == 'light':
+            bg_color = '#f6f8fa'  # Default light background
+        bg_match = re.search(r'<rect width="[^"]*" height="[^"]*" fill="([^"]*)"', content_svg)
+        if bg_match:
+            bg_color = bg_match.group(1)
+
+        # Calculate window dimensions - add titlebar height and bottom padding
         window_width = content_width
-        window_height = content_height + titlebar_height
+        window_height = content_height + titlebar_height + bottom_padding
 
         # Generate window title
         window_title = f"Terminal — {self.username}@github.com"
@@ -808,6 +817,11 @@ class GitHubProfileGenerator:
 <rect x="0" y="0" width="{window_width}" height="{titlebar_height}" rx="12" ry="12" fill="url(#titlebar-gradient)" filter="url(#window-shadow)"/>
 <!-- Rectangle to square off bottom of titlebar -->
 <rect x="0" y="{titlebar_height // 2}" width="{window_width}" height="{titlebar_height // 2}" fill="url(#titlebar-gradient)"/>
+
+<!-- Bottom rounded corners -->
+<rect x="0" y="{titlebar_height + content_height}" width="{window_width}" height="{bottom_padding}" rx="12" ry="12" fill="{bg_color}"/>
+<!-- Rectangle to square off top of bottom rounded part -->
+<rect x="0" y="{titlebar_height + content_height}" width="{window_width}" height="{bottom_padding // 2}" fill="{bg_color}"/>
 
 <!-- Traffic lights -->
 <circle cx="{12 + traffic_light_size // 2}" cy="{titlebar_height // 2}" r="{traffic_light_size // 2}" fill="#ff5f57"/>
